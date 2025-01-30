@@ -1,0 +1,1 @@
+export 'package:sl_salt/exception/custom_exception.dart';

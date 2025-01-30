@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "333513427564",
+    "project_id": "slsalt-6ea65",
+    "storage_bucket": "slsalt-6ea65.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:333513427564:android:60cfc29f2e30967561e649",
+        "android_client_info": {
+          "package_name": "com.example.sl_salt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcjT83c7PjwXGWszYI9f-B6nNDfuTk7Ds"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
