@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sl_salt/bloc/data/data_bloc.dart';
 import 'package:sl_salt/routes/route_name.dart';
 
 class Datainputpage extends StatefulWidget {
@@ -10,23 +13,20 @@ class Datainputpage extends StatefulWidget {
 }
 
 class _DatainputpageState extends State<Datainputpage> {
-  // Controllers for the input fields
-  final TextEditingController morningReading1 = TextEditingController();
-  final TextEditingController morningReading2 = TextEditingController();
-  final TextEditingController eveningReading1 = TextEditingController();
-  final TextEditingController eveningReading2 = TextEditingController();
-  final TextEditingController dailyRainfall = TextEditingController();
+  final TextEditingController morningReading1Controller = TextEditingController();
+  final TextEditingController morningReading2Controller = TextEditingController();
+  final TextEditingController eveningReading1Controller = TextEditingController();
+  final TextEditingController eveningReading2Controller = TextEditingController();
+  final TextEditingController dailyRainfallController = TextEditingController();
 
-  // Initial date as the current date
   DateTime selectedDate = DateTime.now();
 
-  // Method to pick a date using the calendar popup
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: selectedDate,
-      firstDate: DateTime(2000), // Earliest date selectable
-      lastDate: DateTime(2100), // Latest date selectable
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
     );
     if (pickedDate != null && pickedDate != selectedDate) {
       setState(() {
@@ -39,14 +39,18 @@ class _DatainputpageState extends State<Datainputpage> {
     return DateFormat('dd MMM yyyy').format(selectedDate);
   }
 
+  double _parseDouble(String value) {
+    return double.tryParse(value) ?? 0.0;
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Get current date in desired format
-    String currentDate = DateFormat('dd MMM yyyy').format(DateTime.now());
+    final String boxName = ModalRoute.of(context)!.settings.arguments as String? ?? 'Unknown Box';
+    print(boxName);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Data Input'),
+        title: Text('Data Input - $boxName'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -73,59 +77,40 @@ class _DatainputpageState extends State<Datainputpage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Morning Readings',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            const Text('Morning Readings', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            TextField(
+              controller: morningReading1Controller,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Morning Reading 1', border: OutlineInputBorder()),
             ),
             const SizedBox(height: 8),
             TextField(
-              controller: morningReading1,
-              decoration: const InputDecoration(
-                labelText: 'Morning Reading 1',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: morningReading2,
-              decoration: const InputDecoration(
-                labelText: 'Morning Reading 2',
-                border: OutlineInputBorder(),
-              ),
+              controller: morningReading2Controller,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Morning Reading 2', border: OutlineInputBorder()),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Evening Readings',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            const Text('Evening Readings', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            TextField(
+              controller: eveningReading1Controller,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Evening Reading 1', border: OutlineInputBorder()),
             ),
             const SizedBox(height: 8),
             TextField(
-              controller: eveningReading1,
-              decoration: const InputDecoration(
-                labelText: 'Evening Reading 1',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: eveningReading2,
-              decoration: const InputDecoration(
-                labelText: 'Evening Reading 2',
-                border: OutlineInputBorder(),
-              ),
+              controller: eveningReading2Controller,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Evening Reading 2', border: OutlineInputBorder()),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Daily Rainfall',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            const Text('Daily Rainfall', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             TextField(
-              controller: dailyRainfall,
-              decoration: const InputDecoration(
-                labelText: 'Rainfall (in mm)',
-                border: OutlineInputBorder(),
-              ),
+              controller: dailyRainfallController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Rainfall (in mm)', border: OutlineInputBorder()),
             ),
             const SizedBox(height: 24),
             Row(
@@ -133,16 +118,35 @@ class _DatainputpageState extends State<Datainputpage> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Save logic
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Data Saved!')),
-                    );
+                    User? user = FirebaseAuth.instance.currentUser;
+                    if (user != null) {
+                      context.read<DataBloc>().add(
+                            SaveDataEvent(
+                              morningReading1: _parseDouble(morningReading1Controller.text),
+                              morningReading2: _parseDouble(morningReading2Controller.text),
+                              eveningReading1: _parseDouble(eveningReading1Controller.text),
+                              eveningReading2: _parseDouble(eveningReading2Controller.text),
+                              dailyRainfall: _parseDouble(dailyRainfallController.text),
+                              pool: boxName,
+                              dateOfReading: selectedDate,
+                              user: user.uid, // Pass the logged-in user's ID
+                            ),
+                          );
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Data Saved!')),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Error: No user logged in')),
+                      );
+                    }
+                    print(boxName);
                   },
                   child: const Text('Save'),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Edit logic
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Edit Mode Enabled!')),
                     );

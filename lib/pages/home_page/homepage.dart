@@ -74,7 +74,7 @@ class HomeTab extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, RouteNames.data);
+                        Navigator.pushReplacementNamed(context, RouteNames.data,arguments: 'Box 1',);
                         // Navigate to the sign-up page or reset password logic
                       },
                       style: ElevatedButton.styleFrom(
@@ -97,7 +97,7 @@ class HomeTab extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, RouteNames.data);
+                        Navigator.pushReplacementNamed(context, RouteNames.data,arguments: 'Box 2',);
                         // Navigate to the sign-up page or reset password logic
                       },
                       style: ElevatedButton.styleFrom(
@@ -120,7 +120,7 @@ class HomeTab extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, RouteNames.data);
+                        Navigator.pushReplacementNamed(context, RouteNames.data, arguments: 'Box 3',);
                         // Navigate to the sign-up page or reset password logic
                       },
                       style: ElevatedButton.styleFrom(

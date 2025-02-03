@@ -16,7 +16,10 @@ class AppRoutes {
       case RouteNames.home:
         return MaterialPageRoute(builder: (_) => const HomePage());
       case RouteNames.data:
-        return MaterialPageRoute(builder: (_) => const Datainputpage());
+        return MaterialPageRoute(
+          builder: (_) => const Datainputpage(),
+          settings: settings,
+        );
       case RouteNames.register:
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
       default:

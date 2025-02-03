@@ -21,14 +21,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             if (isFirstTime) {
               emit(FirstTimeLogin(user));
             } else {
-              final isSessionExpired =
-                  await authRepository.checkSessionExpiry();
+              final isSessionExpired = await authRepository.checkSessionExpiry();
               if (isSessionExpired) {
                 add(LoggedOutEvent());
               } else {
                 final userModel = await authRepository.getUserDetails(user.uid);
                 if (userModel.role == 'student') {
-                  emit(StudentAuthenticated(user));
+                  emit(LaboursAuthenticated(user));
                 } else if (userModel.role == 'canteena') {
                   emit(CanteenAAuthenticated(user));
                 } else if (userModel.role == 'canteenb') {
@@ -50,21 +49,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LoggedInEvent>((event, emit) async {
       emit(AuthStateLoading());
       try {
-        final user = await authRepository.signInWithUsernameAndPassword(
-            event.username, event.password);
-        final isFirstTime = await authRepository.isFirstTimeLogin(user);
+        final user = await authRepository.signInWithUsernameAndPassword(event.username, event.password);
+        // final isFirstTime = await authRepository.isFirstTimeLogin(user);
 
-        if (isFirstTime) {
-          emit(FirstTimeLogin(user));
-        } else {
-          final userModel = await authRepository.getUserDetails(user.uid);
-          if (userModel.role == 'student') {
-            emit(StudentAuthenticated(user));
-          } else if (userModel.role == 'canteena') {
-            emit(CanteenAAuthenticated(user));
-          } else if ((userModel.role == 'canteenb')) {
-            emit(CanteenBAuthenticated(user));
-          }
+        final userModel = await authRepository.getUserDetails(user.uid);
+        if (userModel.role == 'labours') {
+          emit(LaboursAuthenticated(user));
+        } else if (userModel.role == 'admin') {
+          emit(CanteenAAuthenticated(user));
         }
       } catch (e) {
         emit(AuthStateError('$e'));
@@ -74,8 +66,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignUpEvent>((event, emit) async {
       emit(AuthStateLoading());
       try {
-        await authRepository.registerNewUser(
-            event.email, event.password, event.username, event.role);
+        await authRepository.registerNewUser(event.email, event.password, event.username, event.role);
         emit(RegistrationSuccessful());
       } catch (e) {
         emit(AuthStateError('$e'));
@@ -95,8 +86,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<UpdatePasswordEvent>((event, emit) async {
       emit(AuthStateLoading());
       try {
-        await authRepository.updatePassword(
-            event.currentPassword, event.newPassword);
+        await authRepository.updatePassword(event.currentPassword, event.newPassword);
         emit(PasswordUpdated());
       } catch (e) {
         emit(AuthStateError('$e'));

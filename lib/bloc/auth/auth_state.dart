@@ -57,10 +57,10 @@ class RegistrationSuccessful extends AuthState {}
 
 class ResetEmailSent extends AuthState {}
 
-final class StudentAuthenticated extends AuthState {
+final class LaboursAuthenticated extends AuthState {
   final User user;
 
-  const StudentAuthenticated(this.user);
+  const LaboursAuthenticated(this.user);
 
   @override
   List<Object> get props => [user];

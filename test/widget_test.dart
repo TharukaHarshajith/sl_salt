@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:sl_salt/main.dart';
 import 'package:sl_salt/repositories/auth/auth_repositories.dart';
+import 'package:sl_salt/repositories/data/data_repository.dart';
 import 'package:sl_salt/services/auth_services.dart';
 
 void main() {
@@ -17,8 +18,10 @@ void main() {
     final AuthRepository authRepository = AuthRepository(
       firebaseAuthService: FirebaseAuthService(),
     );
+
+    final DataRepository dataRepository = DataRepository( );
     // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp(authRepository: authRepository));
+    await tester.pumpWidget(MyApp(authRepository: authRepository, dataRepository: null,));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

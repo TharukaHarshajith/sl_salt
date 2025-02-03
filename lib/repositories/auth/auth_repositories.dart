@@ -6,8 +6,7 @@ import 'package:sl_salt/services/auth_services.dart';
 class AuthRepository {
   final FirebaseAuthService _firebaseAuthService;
 
-  AuthRepository({FirebaseAuthService? firebaseAuthService})
-      : _firebaseAuthService = firebaseAuthService ?? FirebaseAuthService();
+  AuthRepository({FirebaseAuthService? firebaseAuthService}) : _firebaseAuthService = firebaseAuthService ?? FirebaseAuthService();
 
   Future<bool> isSignedIn() async {
     final prefs = await SharedPreferences.getInstance();
@@ -34,8 +33,7 @@ class AuthRepository {
     return user;
   }
 
-  Future<User> registerNewUser(
-      String email, String password, String username, String role) async {
+  Future<User> registerNewUser(String email, String password, String username, String role) async {
     await _firebaseAuthService.registerNewUser(email, password, username, role);
     final user = _firebaseAuthService.getCurrentUser();
     await _saveSession(user!);
@@ -55,10 +53,8 @@ class AuthRepository {
     return _firebaseAuthService.getCurrentUser();
   }
 
-  Future<void> updatePassword(
-      String currentPassword, String newPassword) async {
-    await _firebaseAuthService.validateAndUpdatePassword(
-        currentPassword, newPassword);
+  Future<void> updatePassword(String currentPassword, String newPassword) async {
+    await _firebaseAuthService.validateAndUpdatePassword(currentPassword, newPassword);
   }
 
   Future<bool> isFirstTimeLogin(User user) async {
@@ -69,8 +65,7 @@ class AuthRepository {
     await _firebaseAuthService.sendPasswordResetEmail(email);
   }
 
-  Future<User> signInWithUsernameAndPassword(
-      String username, String password) async {
+  Future<User> signInWithUsernameAndPassword(String username, String password) async {
     final email = await _firebaseAuthService.getEmailFromUsername(username);
 
     await _firebaseAuthService.signInWithEmailAndPassword(email, password);
@@ -82,8 +77,7 @@ class AuthRepository {
 
   Future<void> _saveSession(User user) async {
     final prefs = await SharedPreferences.getInstance();
-    final expiryTime =
-        DateTime.now().add(const Duration(days: 7)).millisecondsSinceEpoch;
+    final expiryTime = DateTime.now().add(const Duration(days: 7)).millisecondsSinceEpoch;
     await prefs.setString('userId', user.uid);
     await prefs.setInt('expiryTime', expiryTime);
   }

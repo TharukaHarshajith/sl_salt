@@ -2,8 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sl_salt/bloc/auth/auth_bloc.dart'; // Import your AuthBloc
+import 'package:sl_salt/bloc/data/data_bloc.dart';
 import 'package:sl_salt/firebase_options.dart';
 import 'package:sl_salt/repositories/auth/auth_repositories.dart';
+import 'package:sl_salt/repositories/data/data_repository.dart';
 import 'package:sl_salt/services/auth_services.dart';
 import 'routes/routes.dart';
 
@@ -18,12 +20,18 @@ Future<void> main() async {
     firebaseAuthService: FirebaseAuthService(),
   );
 
-  runApp(MyApp(authRepository: authRepository));
+  final DataRepository dataRepository = DataRepository();
+
+  runApp(MyApp(
+    authRepository: authRepository,
+    dataRepository: dataRepository,
+  ));
 }
 
 class MyApp extends StatelessWidget {
   final AuthRepository authRepository;
-  const MyApp({super.key, required this.authRepository});
+  final DataRepository dataRepository;
+  const MyApp({super.key, required this.authRepository, required this.dataRepository});
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +39,9 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<AuthBloc>(
           create: (context) => AuthBloc(authRepository: authRepository),
+        ),
+        BlocProvider<DataBloc>(
+          create: (context) => DataBloc(dataRepository: dataRepository),
         ),
       ],
       child: MaterialApp(
@@ -40,7 +51,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        initialRoute: RouteNames.register, // Set the initial route
+        initialRoute: RouteNames.splash, // Set the initial route
         onGenerateRoute: AppRoutes.generateRoute, // Define route generator
       ),
     );
